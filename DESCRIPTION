@@ -1,0 +1,60 @@
+Package: AnnotationHubData
+Type: Package
+Title: Transform public data resources into Bioconductor Data Structures
+Version: 1.0.0
+Authors@R:
+    c(person("Martin", "Morgan", role="ctb"),
+      person("Marc", "Carlson", role="ctb"),
+      person("Dan", "Tenenbaum", role="ctb"),
+      person("Sonali", "Arora", role="ctb"),
+      person("Paul", "Shannon", role="ctb"),
+      person("Bioconductor Package Maintainer",
+             email="maintainer@bioconductor.org", role="cre"))
+Depends: R (>= 3.2.2), methods, S4Vectors (>= 0.7.21),
+    IRanges (>= 2.3.23), GenomicRanges, AnnotationHub
+Suggests: RUnit, knitr,RMySQL, BiocStyle, grasp2db
+Imports: GenomicFeatures, Rsamtools, rtracklayer, RCurl, BiocGenerics,
+    jsonlite, BiocInstaller, httr,
+    AnnotationDbi, Biobase, Biostrings, DBI, GEOquery,
+    GenomeInfoDb, OrganismDbi, RSQLite, rBiopaxParser,
+    AnnotationForge, futile.logger (>= 1.3.0), XML
+Description: These recipes convert a wide variety and a growing number of
+    public bioinformatic data sets into easily-used standard Bioconductor data
+    structures.
+License: Artistic-2.0
+LazyLoad: yes
+biocViews: DataImport
+VignetteBuilder: knitr
+Collate:
+    Message-class.R
+    ImportPreparer-class.R
+    makeAnnotationHubResource.R
+    AnnotationHubMetadata-class.R
+    utils.R
+    updateResources.R
+    ahmToJson.R
+    webAccessFunctions.R
+    makeBioPaxImporter.R
+    makeChEA.R
+    makedbSNPVCF.R
+    makeEncodeDCC.R
+    makeEnsemblGtfToGRanges.R
+    makeEnsemblFasta.R
+    makeEpigenomeRoadmap.R
+    makeGencodeFasta.R
+    makeGenecodeGFF.R
+    makeGrasp2Db.R
+    makeGSE62944ToExpressionSet.R
+    makeHaemCode.R
+    makeInparanoid8ToDbs.R
+    makeNCBIToOrgDbs.R
+    makeRecentOrgPkgsToDbs.R
+    makePazar.R
+    makeRefNet.R
+    makeUCSCChain.R
+    makeUCSC2Bit.R
+    makeUCSCTracks.R
+    trackWithAuxiliaryTableToGRangesRecipe.R
+    UCSCTrackUpdateChecker.R
+    
+    
