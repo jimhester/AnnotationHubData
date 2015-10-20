@@ -17,8 +17,8 @@ build_script:
   # FIXME: This is wrong if doing a release build.  Should not `useDevel()` in that case
   # - Rscript -e "source('https://bioconductor.org/biocLite.R')" -e "BiocInstaller::useDevel()"
   - Rscript -e "source('https://bioconductor.org/biocLite.R')"
-  # - travis-tool.sh install_deps
   - travis-tool.sh install_bioc_deps
+  - travis-tool.sh install_deps
 
 test_script:
   - travis-tool.sh run_tests
