@@ -34,7 +34,6 @@ Collate:
     updateResources.R
     ahmToJson.R
     webAccessFunctions.R
-    webAccessFunctionsPartTwo.R
     makeBioPaxImporter.R
     makeChEA.R
     makedbSNPVCF.R
