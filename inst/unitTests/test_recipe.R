@@ -2,7 +2,7 @@
 ## Tests to just see if we can run all of our recipes
 
 ahroot <- "/var/FastRWeb/web"
-BiocVersion <- c("3.1") 
+BiocVersion <- c("3.1")
 
 test_HaemCodeImportPreparer_recipe <- function() {
     ahms = updateResources(ahroot, BiocVersion,
@@ -26,7 +26,7 @@ test_UCSCChainPreparer_recipe <- function() {
         insert = FALSE, metadataOnly=TRUE, justRunUnitTest=TRUE)
     checkTrue(class(ahms[[1]])=="AnnotationHubMetadata")
 }
- 
+
 test_UCSC2BitPreparer_recipe <- function() {
     ahms = updateResources(ahroot, BiocVersion,
         preparerClasses = "UCSC2BitPreparer",
@@ -54,7 +54,7 @@ test_dbSNPVCFPreparer_recipe <- function() {
         insert = FALSE, metadataOnly=TRUE, justRunUnitTest=TRUE)
     checkTrue(class(ahms[[1]])=="AnnotationHubMetadata")
 }
- 
+
 test_RefNetImportPreparer_recipe <- function() {
     ahms = updateResources(ahroot, BiocVersion,
         preparerClasses = "RefNetImportPreparer",
@@ -138,4 +138,3 @@ test_GencodeFasta <- function() {
                            justRunUnitTest=TRUE)
     checkTrue(class(ahms[[1]])=="AnnotationHubMetadata")
 }
-

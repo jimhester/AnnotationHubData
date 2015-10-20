@@ -13,8 +13,7 @@
 .ensemblDirUrl <-
     function(url, dir,  regex = .ensemblReleaseRegex)
 {
-    lst <- getURL(url=url, dirlistonly=TRUE, followlocation=TRUE) 
-    lst <- strsplit(lst, "\n")[[1]]
+    lst <- .ftpDirectoryInfo(url)
     releases <- paste0(url, lst)
     paste(grep(regex, releases, value=TRUE), dir, sep="/")
 }
@@ -39,10 +38,10 @@
         GenomeInfoDb:::.taxonomyId(uspecies)[match(species, uspecies)]
     })
     ## extract info about source size and source mod date etc.
-    ftpInfo <- .httrFileInfo(files=sourceUrl) 
+    ftpInfo <- .httrFileInfo(files=sourceUrl)
     sourceSize <- ftpInfo$size
     sourceLastModDate <- ftpInfo$date
-    
+
     list(annotationHubRoot = root, title=title, species = species,
          taxonomyId = as.integer(taxonomyId),
          genome = sub("^([[:alpha:]_]+)\\.(\\w*)\\.(.*)", "\\2", title,
@@ -57,21 +56,20 @@
       "dna.toplevel", "ncrna", "pep.all")
 
 ## retrieve FASTA file urls from Ensembl
-## these should look "like" sourcUrls in the existing DB 
+## these should look "like" sourcUrls in the existing DB
 .ensemblFastaSourceUrls <-
     function(baseUrl)
 {
     ## handle pointer must exist in external scope.
-    
+
 
     want <- .ensemblDirUrl(baseUrl, "fasta/")
     ## files in release ## BOOM
 
     .processUrl <- function(url) {
-        listing <- getURL(url=url, followlocation=TRUE, customrequest="LIST -R")
-        listing<- strsplit(listing, "\n")[[1]]
+        listing <- .listRemoteFiles(url)
 
-        subdirIdx <- grepl(".*/.*:", listing)  
+        subdirIdx <- grepl(".*/.*:", listing)
         subdir <- sub("^(.*):$", "\\1", listing[subdirIdx])
 
         fileTypes <- paste(.ensemblFastaTypes, collapse="|")
@@ -85,12 +83,12 @@
 
         sprintf("%s%s/%s", url, subdir, fasta)
     }
-    
+
     res <- unlist(lapply(want, .processUrl), use.names=FALSE)
 
 ## TEMP HACK to allow faster testing by only doing the 1st couple records
 ##   res <- res[1:2]
-    
+
     if (length(res) == 0) {
         txt <- sprintf("no fasta files at %s",
                        paste(sQuote(want), collapse=", "))
@@ -108,13 +106,13 @@ makeEnsemblFastaToAHMs <-
     time1 <- Sys.time()
     baseUrl = .ensemblBaseUrl
     ## get all possible sourceUrls
-    sourceUrl <- .ensemblFastaSourceUrls(.ensemblBaseUrl) 
-    
+    sourceUrl <- .ensemblFastaSourceUrls(.ensemblBaseUrl)
+
     if(justRunUnitTest)
         sourceUrl <- sourceUrl[1:5]
-    
+
     sourceFile <- .ensemblSourcePathFromUrl(baseUrl, sourceUrl)
-    meta <- .ensemblMetadataFromUrl(sourceUrl) 
+    meta <- .ensemblMetadataFromUrl(sourceUrl)
     dnaType <- local({
         x <- basename(dirname(sourceFile))
         sub("(dna|rna)", "\\U\\1", x, perl=TRUE)
@@ -128,7 +126,7 @@ makeEnsemblFastaToAHMs <-
     ## Then the 2nd record of each set need to become an '.fai' file
     rdatapaths <- lapply(rdatapaths,
                          function(x){x[2] <- paste0(x[2],".fai") ; return(x)})
-    
+
     Map(AnnotationHubMetadata,
         Description=description,
         Genome=meta$genome,
@@ -146,7 +144,7 @@ makeEnsemblFastaToAHMs <-
           DataProvider = "Ensembl",
           Maintainer = "Martin Morgan <mtmorgan@fredhutch.org>",
           SourceType="FASTA",
-          DispatchClass="FaFile", 
+          DispatchClass="FaFile",
           RDataClass = c("FaFile", "FaFile"),
           RDataDateAdded = Sys.time(),
           Recipe = "AnnotationHubData:::ensemblFastaToFaFile",
@@ -174,7 +172,7 @@ makeAnnotationHubResource("EnsemblFastaImportPreparer",
 ## +   preparerClasses = "EnsemblFastaImportPreparer",
 ## +   insert = FALSE, metadataOnly=TRUE)
 ## INFO [2015-05-22 17:20:06] Preparer Class: EnsemblFastaImportPreparer
-## Error in initialize(value, ...) : 
+## Error in initialize(value, ...) :
 ##   invalid names for slots of class “AnnotationHubMetadata”: Location_prefix, RDataSize, RDataLastModifiedDate
 ## In addition: Warning message:
 ## In if (is.na(species)) { :

@@ -13,28 +13,24 @@
 ## Try a new strategy for getting ALL the dir listings at ONCE.
 
 ###############################################
-## make this into a function and call it
 .getListing <- function(){
-    ## I did this once and then saved it (it takes a few minutes)
-    listing <- getURL(url="ftp://hgdownload.cse.ucsc.edu/goldenPath/",
-                      followlocation=TRUE, customrequest="LIST -R")
-    ## then bust that into single rows.
-    listing <- strsplit(listing,"\n")[[1]]
+    listing <- .listRemoteFiles("ftp://hgdownload.cse.ucsc.edu/goldenPath/")
     save(listing, file="listing.Rda")
     listing
 }
-## listing <- .getListing()
 
 ###############################################
 ## need to get symlinks
 .getGenomeAbbrevs <- function(genomes){
-    baseList <- getURL(url="ftp://hgdownload.cse.ucsc.edu/goldenPath/",
-                       curl=handle_find(url)$handle)
+    # NB: handle_find will retrieve (or create and retrieve) the handle from a pool of handles.
+    # However, I'm unsure if the following line will work (is url NUL ?).  So, this should be
+    # thoroughly tested.
+    baseList <- RCurl::getURL(url="ftp://hgdownload.cse.ucsc.edu/goldenPath/", curl=handle_find(url)$handle) # TODO: READ COMMENT ABOVE
     baseList <- strsplit(baseList,"\n")[[1]]
     ## baseList[grep('cb1',baseList)]
     ## baseList[grep(genome[1],baseList)] ## a normal one
 
-    ## go through all the genomes, and for each one, check if it's like    
+    ## go through all the genomes, and for each one, check if it's like
     ## cb1, replace as necessary
     checkForAndRetrieveSymLinks <- function(genStr){
         genStr2 <- paste(" ",genStr, sep="")
@@ -46,7 +42,7 @@
             res <- genStr
         }
         res
-    }    
+    }
     unlist(lapply(genomes, checkForAndRetrieveSymLinks))
 }
 ## genomes2 <- .getGenomeAbbrevs(genomes)
@@ -88,7 +84,7 @@
         ## if(length(end) >1){ message("too many ends for: \n", genome)}
         listing[genIdx:(end-1)]
     }
-    
+
     dirs <- getRange(genDbIdx[names(genDbIdx) %in% genome],
                      subsIdx, listing)
     dirs <- dirs[-(1:3)]
@@ -100,7 +96,7 @@
     ## remove .txt.gz from name
     dirs <- sub(".txt.gz$","",dirs)
 
-    
+
     ## UCSC means for abbreviating months.
     months <- c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep',
                 'Oct','Nov','Dec')
@@ -142,7 +138,7 @@
 ## latest date information from the FTP site.
 getLatestTableDates <- function(){
     listing <- .getListing()
-    allTracks <- .cachedTracks("allPossibleTracks.rda") 
+    allTracks <- .cachedTracks("allPossibleTracks.rda")
     badTracks <- .cachedTracks("allBadTracks.rda")
     goodTracks <- mapply(.filter, allTracks, badTracks)
     genomes <- names(goodTracks)
@@ -195,7 +191,7 @@ getLatestTableDates <- function(){
         genomeTrackTable[[i]] <- .getTrackTablesForGenome(genomes[i],
                                                           trackLists[[i]])
         names(genomeTrackTable)[i] <- genomes[i]
-        save(genomeTrackTable,file="genomeTrackTable.Rda") 
+        save(genomeTrackTable,file="genomeTrackTable.Rda")
     }
     genomeTrackTable
 }
@@ -221,7 +217,7 @@ getLatestTableDates <- function(){
 getLatestTrackDates <- function(){
     curTables <- getLatestTableDates()
     genomeTrackTable <-
-        .cachedTracks("genomeTrackTable.Rda") 
+        .cachedTracks("genomeTrackTable.Rda")
     ## rough sketch (for now)
     trackDates <- list()
     for(i in seq_along(names(genomeTrackTable))){
@@ -285,7 +281,7 @@ getAHTrackDates <- function(){
 tracksToUpdate <- function(){
     trackDates <- getLatestTrackDates()
     ahTrackDates <-  getAHTrackDates()
-    
+
     ## go along and for each list element in ahTrackDates we will need
     ## to look at the equivalent element from trackDates and then
     ## compare the dates.  Dates will be not OK (TRUE for update
@@ -299,7 +295,7 @@ tracksToUpdate <- function(){
         }else{
             if(as.POSIXct(x) > as.POSIXct(other[names(x)])){
                 return(FALSE)
-            }else{ ## this means it needs an update 
+            }else{ ## this means it needs an update
                 return(TRUE)
             }
         }
@@ -316,7 +312,7 @@ tracksToUpdate <- function(){
         names(res) <- names(ah)
         res
     }
-    
+
 
     ## I have to loop along the ahTrackDates object. I can use lapply
     ## (but not mapply), and have to pass in all of trackDates every
@@ -333,4 +329,3 @@ tracksToUpdate <- function(){
     res
 }
 ## res <- tracksToUpdate()
-
